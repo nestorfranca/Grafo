@@ -126,3 +126,29 @@ int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_f
     return NULL;
 
 }
+
+void vertices_isolados(int **matriz, int tamanho) {
+    int i, j, vertice_isolado;
+
+    printf("Vértices isolados (sem arestas conectadas a outros vértices):\n");
+
+    // Verifica cada vértice na matriz
+    for (i = 0; i < tamanho; i++) {
+        vertice_isolado = 1; // Assume que o vértice é isolado inicialmente
+
+        // Verifica a linha correspondente ao vértice na matriz
+        for (j = 0; j < tamanho; j++) {
+            if (matriz[i][j] != 0) {
+                vertice_isolado = 0; // O vértice possui uma aresta conectada, portanto não é isolado
+                break;
+            }
+        }
+
+        // Se o vértice for isolado (todas as arestas são zero)
+        if (vertice_isolado) {
+            printf("%d ", i); // Imprime o vértice isolado
+        }
+    }
+
+    printf("\n");
+}

@@ -22,6 +22,8 @@ int main()
         }
         printf("\n");
     }
-
+    
+    vertices_isolados(matriz, tamanho);
+    
     return 0;
 }

@@ -1,31 +1,57 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define tamanho 3782
-void lerarquivo (const char *dados_matriz){
-    FILE *arquivo;
-    char linha[tamanho];
+#define tamanho_matriz 3782
+void ler_arquivo(char *nome_arquivo, int **matriz)
+{
+    FILE *arch;
+    char linha[tamanho_matriz];
+    char *token;
+    int i = 0, j = 0;
+    arch = fopen(nome_arquivo, "r");
+    while (fgets(linha, tamanho_matriz, arch))
+    {
+        token = strtok(linha, " ");
+        j = 0;
+        while (j < tamanho_matriz)
+        {
 
-    arquivo =fopen(dados_matriz, "r");
-
-    if(arquivo == NULL){
-        printf("Erro ao abrir o arquivo \n");
-        return;
+            matriz[i][j] = atoi(token);
+            token = strtok(NULL, " ");
+            j++;
+        }
+        i++;
+        if (i >= tamanho_matriz)
+        {
+            break;
+        }
     }
-
-    while (fgets(linha, sizeof(linha), arquivo) != NULL){
-        printf ("%s", linha);
-
-    }
-
-    fclose(arquivo);
-
-    
+    fclose(arch);
 }
 
-int main(void){
+void mostraMatriz(int **matriz)
+{
+    int i, j;
 
-    
-    lerarquivo ("dados_matriz.txt");
-    return 0;
+    for (i = 0; i < tamanho_matriz; i++)
+    {
+        for (j = 0; j < tamanho_matriz; j++)
+        {
 
+            printf(" %i ", matriz[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main()
+{
+
+    int **matriz = (int **)malloc(tamanho_matriz * sizeof(int *));
+    int i;
+    for (i = 0; i < tamanho_matriz; i++)
+        matriz[i] = (int *)malloc(tamanho_matriz * sizeof(int));
+    ler_arquivo("dados_matriz.txt", matriz);
+    mostraMatriz(matriz);
 }

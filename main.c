@@ -1,57 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
-#define tamanho_matriz 3782
-void ler_arquivo(char *nome_arquivo, int **matriz)
-{
-    FILE *arch;
-    char linha[tamanho_matriz];
-    char *token;
-    int i = 0, j = 0;
-    arch = fopen(nome_arquivo, "r");
-    while (fgets(linha, tamanho_matriz, arch))
-    {
-        token = strtok(linha, " ");
-        j = 0;
-        while (j < tamanho_matriz)
-        {
-
-            matriz[i][j] = atoi(token);
-            token = strtok(NULL, " ");
-            j++;
-        }
-        i++;
-        if (i >= tamanho_matriz)
-        {
-            break;
-        }
-    }
-    fclose(arch);
-}
-
-void mostraMatriz(int **matriz)
-{
-    int i, j;
-
-    for (i = 0; i < tamanho_matriz; i++)
-    {
-        for (j = 0; j < tamanho_matriz; j++)
-        {
-
-            printf(" %i ", matriz[i][j]);
-        }
-        printf("\n");
-    }
-}
+#include "grafo.c"
 
 int main()
 {
+    int **matriz, tamanho;
+    matriz = importa_matriz("dados_matriz_teste.txt", matriz, &tamanho);
+    // mostra_matriz(matriz, tamanho);
+    
+    int *caminho = (int*)calloc(100, sizeof(int));
+    caminho = conexao_vertices(matriz, caminho, 0, tamanho-1);
 
-    int **matriz = (int **)malloc(tamanho_matriz * sizeof(int *));
-    int i;
-    for (i = 0; i < tamanho_matriz; i++)
-        matriz[i] = (int *)malloc(tamanho_matriz * sizeof(int));
-    ler_arquivo("dados_matriz.txt", matriz);
-    mostraMatriz(matriz);
+    if (caminho == NULL)
+        printf("Nao ha conexao entre o primeiro e o ultimo vertice!\n");
+    
+    else {
+        printf("%d ", caminho[0]);
+        int i;
+        for (i = 1; caminho[i] != 0; i++) {
+            printf("-> %d ", caminho[i]);
+        }
+        printf("\n");
+    }
+
+    return 0;
 }

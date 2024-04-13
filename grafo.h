@@ -21,3 +21,5 @@ int verifica_simetria(int **matriz);
    escolhidos
 */
 int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_fim);
+
+int *vertices_isolados(int **matriz, int *vertice_arr, int tamanho, int *num_vertices);

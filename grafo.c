@@ -90,7 +90,6 @@ int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_f
         return NULL;
 
     caminho[id_caminho++] = vertice_ini; /* adiciona vértice no caminho */
-    
     id_caminho_ant = id_caminho;    /* salva o vértice de origem dessa recursão */
 
     if (vertice_fim+1 == 1) /* só há um vértice na matriz */
@@ -111,6 +110,10 @@ int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_f
 
             if (caminho_temp != NULL) { /* encontrou uma conexão */
                 caminho = caminho_temp;
+                caminho = (int*)realloc(caminho, (id_caminho+1)*sizeof(int));
+                if (caminho == NULL) exit(1);
+
+                caminho[id_caminho] = 0;  /* marcador de parada no fim */
                 return caminho;         /* finaliza busca */
             } 
 
@@ -127,28 +130,31 @@ int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_f
 
 }
 
-void vertices_isolados(int **matriz, int tamanho) {
-    int i, j, vertice_isolado;
-
-    printf("Vértices isolados (sem arestas conectadas a outros vértices):\n");
+int *vertices_isolados(int **matriz, int *vertice_arr, int tamanho, int *num_vertices)
+{
+    int i, j, vertice_isolado, *vertice;
+    int vertice_count = 0;
 
     // Verifica cada vértice na matriz
     for (i = 0; i < tamanho; i++) {
-        vertice_isolado = 1; // Assume que o vértice é isolado inicialmente
+        vertice_isolado = 1; /* Assume que o vértice é isolado inicialmente */
 
         // Verifica a linha correspondente ao vértice na matriz
         for (j = 0; j < tamanho; j++) {
-            if (matriz[i][j] != 0) {
-                vertice_isolado = 0; // O vértice possui uma aresta conectada, portanto não é isolado
-                break;
+            if (matriz[i][j] == 1) {    /* não é isolado */
+                vertice_isolado = 0;
+                break;  /* interrompe loop */
             }
         }
 
-        // Se o vértice for isolado (todas as arestas são zero)
-        if (vertice_isolado) {
-            printf("%d ", i); // Imprime o vértice isolado
-        }
+        // alocar espaço no vetor, para adicionar vértice:
+        if (vertice_isolado)
+            vertice_arr[vertice_count++] = i;
     }
 
-    printf("\n");
+    vertice_arr = (int*)realloc(vertice_arr, (vertice_count+1)*sizeof(int));
+    if (vertice_arr == NULL) exit(1);
+
+    *num_vertices = vertice_count;
+    return vertice_arr;
 }

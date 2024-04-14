@@ -34,14 +34,6 @@ int menu_voltar();
 */
 int teste_input(void);
 
-/* Função teste_formato
-    Verifica o tipo da entrada
-     - inteiro (positivo ou negativo)
-     - real
-     - string
-*/
-int teste_formato(char *str);
-
 /* Função alert
  - Modifica o código de erro atual do sistema.
 */

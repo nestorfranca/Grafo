@@ -79,8 +79,6 @@ int verifica_simetria(int **matriz) {
     return 1;
 }
 
-
-
 int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_fim)
 {
     static int id_caminho = 0;
@@ -90,7 +88,6 @@ int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_f
         return NULL;
 
     caminho[id_caminho++] = vertice_ini; /* adiciona vértice no caminho */
-    
     id_caminho_ant = id_caminho;    /* salva o vértice de origem dessa recursão */
 
     if (vertice_fim+1 == 1) /* só há um vértice na matriz */
@@ -111,6 +108,10 @@ int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_f
 
             if (caminho_temp != NULL) { /* encontrou uma conexão */
                 caminho = caminho_temp;
+                caminho = (int*)realloc(caminho, (id_caminho+1)*sizeof(int));
+                if (caminho == NULL) exit(1);
+
+                caminho[id_caminho] = 0;  /* marcador de parada no fim */
                 return caminho;         /* finaliza busca */
             } 
 
@@ -127,28 +128,102 @@ int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_f
 
 }
 
-void vertices_isolados(int **matriz, int tamanho) {
-    int i, j, vertice_isolado;
-
-    printf("Vértices isolados (sem arestas conectadas a outros vértices):\n");
+int *vertices_isolados(int **matriz, int *vertice_arr, int tamanho, int *num_vertices)
+{
+    int i, j, vertice_isolado, *vertice;
+    int vertice_count = 0;
 
     // Verifica cada vértice na matriz
     for (i = 0; i < tamanho; i++) {
-        vertice_isolado = 1; // Assume que o vértice é isolado inicialmente
+        vertice_isolado = 1; /* Assume que o vértice é isolado inicialmente */
 
         // Verifica a linha correspondente ao vértice na matriz
         for (j = 0; j < tamanho; j++) {
-            if (matriz[i][j] != 0) {
-                vertice_isolado = 0; // O vértice possui uma aresta conectada, portanto não é isolado
-                break;
+            if (matriz[i][j] == 1) {    /* não é isolado */
+                vertice_isolado = 0;
+                break;  /* interrompe loop */
             }
         }
 
-        // Se o vértice for isolado (todas as arestas são zero)
-        if (vertice_isolado) {
-            printf("%d ", i); // Imprime o vértice isolado
-        }
+        // alocar espaço no vetor, para adicionar vértice:
+        if (vertice_isolado)
+            vertice_arr[vertice_count++] = i;
     }
 
-    printf("\n");
+    vertice_arr = (int*)realloc(vertice_arr, (vertice_count+1)*sizeof(int));
+    if (vertice_arr == NULL) exit(1);
+
+    *num_vertices = vertice_count;
+    return vertice_arr;
+}
+
+int *grau_vertices(int **matriz, int tamanho){
+    int index1, index2;
+    int *grau = (int*) malloc(tamanho*sizeof(int));
+    if(grau == NULL){
+        printf("Memoria nao alocada.");
+        exit(1);
+    }
+
+    for(index1 = 0; index1 < tamanho; index1++){
+        int graudovertice = 0;
+        for(index2 = 0; index2 < tamanho; index2++){
+            if(matriz[index1][index2] == 1){
+                graudovertice++;
+            }
+        }
+        grau[index1] = graudovertice;
+    }
+
+    return grau;
+}
+
+int *maior_vertice(int *grau, int tamanho, int *quantidade_vertices){
+    int index, tamanho_vetor = 1, maior_grau = 0;
+    int *maiores_vertices = (int*) malloc(sizeof(int));
+
+    maiores_vertices[0] = 1;
+    maior_grau = grau[0];
+    
+    for(index = 1; index < tamanho; index++){
+        if(grau[index] > maior_grau){
+            // printf("%d  %d\n",grau[index], grau[index-1]);
+            if (tamanho_vetor > 1){
+                // printf("oi\n");
+                maiores_vertices = realocar_memoria(maiores_vertices, 0);
+                tamanho_vetor = 1;
+            }
+            maior_grau = grau[index];
+            maiores_vertices[0] = index+1;
+        }else if(grau[index] == maior_grau){
+            // printf(":)");
+            maiores_vertices = realocar_memoria(maiores_vertices, tamanho_vetor);
+            tamanho_vetor++;
+            maiores_vertices[tamanho_vetor-1] = index+1;
+        }
+    }
+    (*quantidade_vertices) = tamanho_vetor;
+
+    return maiores_vertices;
+}
+
+int *realocar_memoria(int *vetor, int tamanho_vetor){
+    return (int*)realloc(vetor, (tamanho_vetor+1)*sizeof(int));
+}
+
+void grau_arquivo(int *grau, int tamanho){
+    FILE *arquivo;
+    int index = 0;
+
+    arquivo = fopen("dados_grafos_graus.txt", "w");
+    if(arquivo == NULL){
+        printf("\nFalha ao abrir o arquivo.");
+        exit(1);
+    }
+
+    fprintf(arquivo, "%s\t%s\n", "Vertice", "Grau");
+    for (index; index < tamanho; index++)
+    {
+        fprintf(arquivo, "%d\t%d\n", index+1, grau[index]);
+    }  
 }

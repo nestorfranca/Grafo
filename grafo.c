@@ -79,8 +79,6 @@ int verifica_simetria(int **matriz) {
     return 1;
 }
 
-
-
 int *conexao_vertices(int **matriz, int *caminho, int vertice_ini, int vertice_fim)
 {
     static int id_caminho = 0;
@@ -157,4 +155,75 @@ int *vertices_isolados(int **matriz, int *vertice_arr, int tamanho, int *num_ver
 
     *num_vertices = vertice_count;
     return vertice_arr;
+}
+
+int *grau_vertices(int **matriz, int tamanho){
+    int index1, index2;
+    int *grau = (int*) malloc(tamanho*sizeof(int));
+    if(grau == NULL){
+        printf("Memoria nao alocada.");
+        exit(1);
+    }
+
+    for(index1 = 0; index1 < tamanho; index1++){
+        int graudovertice = 0;
+        for(index2 = 0; index2 < tamanho; index2++){
+            if(matriz[index1][index2] == 1){
+                graudovertice++;
+            }
+        }
+        grau[index1] = graudovertice;
+    }
+
+    return grau;
+}
+
+int *maior_vertice(int *grau, int tamanho, int *quantidade_vertices){
+    int index, tamanho_vetor = 1, maior_grau = 0;
+    int *maiores_vertices = (int*) malloc(sizeof(int));
+
+    maiores_vertices[0] = 1;
+    maior_grau = grau[0];
+    
+    for(index = 1; index < tamanho; index++){
+        if(grau[index] > maior_grau){
+            // printf("%d  %d\n",grau[index], grau[index-1]);
+            if (tamanho_vetor > 1){
+                // printf("oi\n");
+                maiores_vertices = realocar_memoria(maiores_vertices, 0);
+                tamanho_vetor = 1;
+            }
+            maior_grau = grau[index];
+            maiores_vertices[0] = index+1;
+        }else if(grau[index] == maior_grau){
+            // printf(":)");
+            maiores_vertices = realocar_memoria(maiores_vertices, tamanho_vetor);
+            tamanho_vetor++;
+            maiores_vertices[tamanho_vetor-1] = index+1;
+        }
+    }
+    (*quantidade_vertices) = tamanho_vetor;
+
+    return maiores_vertices;
+}
+
+int *realocar_memoria(int *vetor, int tamanho_vetor){
+    return (int*)realloc(vetor, (tamanho_vetor+1)*sizeof(int));
+}
+
+void grau_arquivo(int *grau, int tamanho){
+    FILE *arquivo;
+    int index = 0;
+
+    arquivo = fopen("dados_grafos_graus.txt", "w");
+    if(arquivo == NULL){
+        printf("\nFalha ao abrir o arquivo.");
+        exit(1);
+    }
+
+    fprintf(arquivo, "%s\t%s\n", "Vertice", "Grau");
+    for (index; index < tamanho; index++)
+    {
+        fprintf(arquivo, "%d\t%d\n", index+1, grau[index]);
+    }  
 }

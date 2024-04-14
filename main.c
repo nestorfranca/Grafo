@@ -42,8 +42,28 @@ int main()
         }
         printf("\n");
 
-    } else
+    } else{
         printf("Nao ha conexao entre o primeiro e o ultimo vertice!\n");
+    }
+
+    puts("Grau dos vertices");
+// indentifica o grau de cada vertice
+    int *grau = grau_vertices(matriz, tamanho);
+    
+    for(int i = 0; i < tamanho; i++){
+        printf("%d ", grau[i]);
+    }
+
+    puts("\nvertices com maiores graus");
+
+// indentifica qual os vertices tem o maior grau
+    int quantidade_vertices;
+    int *maiores_vertices = maior_vertice(grau, tamanho, &quantidade_vertices);
+    for(int i = 0; i < quantidade_vertices; i++){
+        printf("%d ", maiores_vertices[i]);
+    }
+
+    grau_arquivo(grau, tamanho);
 
     return 0;
 }

@@ -235,26 +235,28 @@ int **subgrafo_induzido(int **matriz, int *vertices, int tamanho, int tamanho_in
                 if (i_induzido >= tamanho_induzido) break;
             }
         }
-
-        // Abrir o arquivo para escrita
-        FILE *arquivo = fopen("dados_grafo_gerador.txt", "wt");
-        if (arquivo == NULL) exit(1);
-
-        // Escrever a nova matriz no arquivo
-        fprintf(arquivo, "%d %d\n", tamanho_induzido, tamanho_induzido);
-        for (int i = 0; i < tamanho_induzido; i++) {
-            for (int j = 0; j < tamanho_induzido; j++) {
-                fprintf(arquivo, "%d ", matriz_induzida[i][j]);
-            }
-            fprintf(arquivo, "\n"); // Nova linha para cada linha da matriz
-        }
-
-        fclose(arquivo); // Fechar o arquivo após a escrita
     }
 
     return matriz_induzida;
 }
 
+void salva_grafo(int **matriz_subgrafo, int tamanho, char *nome_arquivo)
+{
+    // Abrir o arquivo para escrita
+    FILE *arquivo = fopen(nome_arquivo, "wt");
+    if (arquivo == NULL) exit(1);
+
+    // Escrever a nova matriz no arquivo
+    fprintf(arquivo, "%d %d\n", tamanho, tamanho);
+    for (int i = 0; i < tamanho; i++) {
+        for (int j = 0; j < tamanho; j++) {
+            fprintf(arquivo, "%d ", matriz_subgrafo[i][j]);
+        }
+        fprintf(arquivo, "\n"); // Nova linha para cada linha da matriz
+    }
+
+    fclose(arquivo); // Fechar o arquivo após a escrita
+}
 
 
 int *conexao_vertices(int **matriz, int tamanho, int vertice_ini, int vertice_fim)

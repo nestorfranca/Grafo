@@ -145,12 +145,13 @@ int menu_principal(int **matriz, int tamanho) {
             delay(ATRASO);
             break;
         }
-        case '3': { /*Grafo com vértices múltiplo de 5 */
+        case '3': { /* Grafo com vértices múltiplo de 5 */
             printf("\nGerando Grafo Gerador...");  delay(ATRASO);
             int tam_induzido;
             int *vertices_induzido = vertices_multiplos_5(matriz, tamanho, &tam_induzido);
 
             int **subgrafo_multiplo_5 = subgrafo_induzido(matriz, vertices_induzido, tamanho, tam_induzido);
+            salva_grafo(subgrafo_multiplo_5, tam_induzido, "dados_grafo_gerador.txt");
             free(subgrafo_multiplo_5);
 
             alert(3); /* grafo gerado com sucesso */

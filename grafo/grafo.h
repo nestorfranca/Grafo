@@ -48,6 +48,11 @@ int *vertices_multiplos_5(int **matriz, int tamanho, int *num_vertices);
 */
 int **subgrafo_induzido(int **matriz, int *vertices, int tamanho, int tamanho_induzido);
 
+/* Função salva_grafo
+ - escreve a matriz booleana do grafo em um arquivo.
+*/
+void salva_grafo(int **matriz_subgrafo, int tamanho, char *nome_arquivo);
+
 /* Função conexao_primeiro_ultimo
  - Verifica se há um caminho que conecte os vertices
    escolhidos

@@ -15,5 +15,18 @@ int main()
         var = menu_principal(matriz, tamanho);
     } while (var != '6');
 
+   
+
+
+    int **subgrafo = subgrafo_induzido(matriz, tamanho, "dados_grafo_gerador.txt");
+if (subgrafo == NULL) {
+    fprintf(stderr, "Erro ao criar o subgrafo induzido.\n");
+    liberar_matriz(matriz, tamanho);
+    return 1;
+}
+liberar_matriz(matriz, tamanho);
+
+   
     return 0;
 }
+

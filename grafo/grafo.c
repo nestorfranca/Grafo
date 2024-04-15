@@ -226,3 +226,72 @@ void grau_arquivo(int *grau, int tamanho)
     fclose(arquivo);
     alert(2);
 }
+
+
+
+int **subgrafo_induzido(int **matriz, int tamanho, char *nome_arquivo) {
+    // Determinar o tamanho da nova matriz (vértices múltiplos de 5)
+    int novo_tamanho = 0;
+    for (int i = 0; i < tamanho; i++) {
+        if ((i + 1) % 5 == 0) {
+            novo_tamanho++;
+        }
+    }
+
+    // Alocar memória para a nova matriz
+    int **nova_matriz = (int **)malloc(novo_tamanho * sizeof(int *));
+    if (nova_matriz == NULL) {
+        fprintf(stderr, "Erro de alocação de memória.\n");
+        return NULL;
+    }
+
+    for (int i = 0; i < novo_tamanho; i++) {
+        nova_matriz[i] = (int *)malloc(novo_tamanho * sizeof(int));
+        if (nova_matriz[i] == NULL) {
+            fprintf(stderr, "Erro de alocação de memória.\n");
+            // Liberar memória alocada até agora
+            for (int j = 0; j < i; j++) {
+                free(nova_matriz[j]);
+            }
+            free(nova_matriz);
+            return NULL;
+        }
+    }
+
+    // Preencher a nova matriz com os elementos de índice múltiplo de 5 da matriz original
+    for (int i = 0, novo_i = 0; i < tamanho; i++) {
+        if ((i + 1) % 5 == 0) {
+            for (int j = 0, novo_j = 0; j < tamanho; j++) {
+                if ((j + 1) % 5 == 0) {
+                    nova_matriz[novo_i][novo_j] = matriz[i][j];
+                    novo_j++;
+                }
+            }
+            novo_i++;
+        }
+    }
+
+    // Abrir o arquivo para escrita
+    FILE *arquivo = fopen(nome_arquivo, "rw");
+    if (arquivo == NULL) {
+        fprintf(stderr, "Erro ao abrir o arquivo para escrita.\n");
+        // Liberar memória alocada para a nova matriz
+        for (int i = 0; i < novo_tamanho; i++) {
+            free(nova_matriz[i]);
+        }
+        free(nova_matriz);
+        return NULL;
+    }
+
+    // Escrever a nova matriz no arquivo
+    for (int i = 0; i < novo_tamanho; i++) {
+        for (int j = 0; j < novo_tamanho; j++) {
+            fprintf(arquivo, "%d ", nova_matriz[i][j]);
+        }
+        fprintf(arquivo, "\n"); // Nova linha para cada linha da matriz
+    }
+
+    fclose(arquivo); // Fechar o arquivo após a escrita
+
+    return nova_matriz;
+}

@@ -43,3 +43,5 @@ int *maior_grau(int *grau, int tamanho, int *quantidade_vertices);
   - Cria um arquivo e escreve qual o grau de cada vertice
 */
 void grau_arquivo(int *grau, int tamanho);
+
+int **subgrafo_induzido(int **matriz, int tamanho, char *nome_arquivo);

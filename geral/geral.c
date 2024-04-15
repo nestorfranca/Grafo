@@ -91,27 +91,28 @@ int menu_principal(int **matriz, int tamanho) {
             // calcula o grau de todos os vértices:
             int *grau = grau_vertice(matriz, tamanho);
 
-            // armazena a informação do grau dos vértices num arquivo:
-            grau_arquivo(grau, tamanho);
+            if (grau != NULL) {
+                // armazena a informação do grau dos vértices num arquivo:
+                grau_arquivo(grau, tamanho);
 
-            while (1) {
-                cabecalho("\t", "\t\tMAIOR GRAU\t", "");
+                while (1) {
+                    cabecalho("\t", "\t\tMAIOR GRAU\t", "");
 
-                printf("Vertice(s) com maior(es) grau:\n");
-                // identifica qual os vértices tem o maior grau:
-                int quantidade_vertices;
-                int *maiores_grau = maior_grau(grau, tamanho, &quantidade_vertices);
-                for (int i = 0; i < quantidade_vertices; i++) {
-                    printf("Vertice %d:  %d\n", maiores_grau[i], grau[maiores_grau[i]]);
+                    printf("Vertice(s) com maior(es) grau:\n");
+                    // identifica qual os vértices tem o maior grau:
+                    int quantidade_vertices;
+                    int *maiores_grau = maior_grau(grau, tamanho, &quantidade_vertices);
+                    for (int i = 0; i < quantidade_vertices; i++) {
+                        printf("Vertice %d:  %d\n", (maiores_grau[i]+1), grau[maiores_grau[i]]);
+                    }
+
+                    // libera memória alocada
+                    free(maiores_grau);
+                    free(grau);
+
+                    if (menu_voltar()) break;
                 }
-
-
-                // libera memória alocada
-                free(maiores_grau);
-
-                if (menu_voltar()) break;
             }
-            free(grau);
 
             delay(ATRASO);
             break;
@@ -128,9 +129,9 @@ int menu_principal(int **matriz, int tamanho) {
                 
                 printf("Encontrou %d vertice(s) isolado(s):\n", num_isolados);
                 if (isolados != NULL) {
-                    printf("%d", isolados[0]);
+                    printf("%d", isolados[0]+1);
                     for (int i = 1; i < num_isolados; i++) {
-                        printf(" - %d", isolados[i]);
+                        printf(" - %d", isolados[i]+1);
                     }
                     printf("\n");
 
@@ -146,8 +147,13 @@ int menu_principal(int **matriz, int tamanho) {
         }
         case '3': { /*Grafo com vértices múltiplo de 5 */
             printf("\nGerando Grafo Gerador...");  delay(ATRASO);
+            int tam_induzido;
+            int *vertices_induzido = vertices_multiplos_5(matriz, tamanho, &tam_induzido);
 
-            alert(2);
+            int **subgrafo_multiplo_5 = subgrafo_induzido(matriz, vertices_induzido, tamanho, tam_induzido);
+            free(subgrafo_multiplo_5);
+
+            alert(3); /* grafo gerado com sucesso */
             break;
         }
         case '4': { /* maior clique */
@@ -174,12 +180,12 @@ int menu_principal(int **matriz, int tamanho) {
                 int *caminho = conexao_vertices(matriz, tamanho, 0, tamanho-1);
 
                 if (caminho != NULL) {
-                    printf("Caminho entres os vertices %d e %d:\n", 0, tamanho-1);
+                    printf("Caminho entres os vertices %d e %d:\n", 1, tamanho);
                     
-                    printf("%d ", caminho[0]);
+                    printf("%d ", caminho[0]+1);
                     int i;
                     for (i = 1; caminho[i] != 0; i++) {
-                        printf("-> %d ", caminho[i]);
+                        printf("-> %d ", caminho[i]+1);
                     }
                     printf("\n");
 
@@ -241,6 +247,7 @@ void alert_msg(void)
     // alerta de formato: 
     else if (alert_cod == 1) printf(TXT_yellow"\nInsira uma opcao valida!\n"TXT_reset);
     else if (alert_cod == 2) printf(TXT_green"\nArquivo salvo com sucesso!\n"TXT_reset);
+    else if (alert_cod == 3) printf(TXT_green"\nGrafo gerado e salvo com sucesso!\n"TXT_reset);
     // alerta de processo:
 
     alert(0);    /* reseta marcador */

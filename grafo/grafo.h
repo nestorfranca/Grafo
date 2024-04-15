@@ -18,17 +18,6 @@ void mostra_matriz(int **matriz, int tamanho);
 */
 int verifica_simetria(int **matriz);
 
-/* Função conexao_primeiro_ultimo
- - Verifica se há um caminho que conecte os vertices
-   escolhidos
-*/
-int *conexao_vertices(int **matriz, int tamanho, int vertice_ini, int vertice_fim);
-
-/* Função vertices_isolados
- - Verifica vetor com os vértices isolados, se existir
-*/
-int *vertices_isolados(int **matriz, int tamanho, int *num_vertices);
-
 /* Função grau_vertice
   - Retorna o grau de cada vertice
 */
@@ -44,4 +33,23 @@ int *maior_grau(int *grau, int tamanho, int *quantidade_vertices);
 */
 void grau_arquivo(int *grau, int tamanho);
 
-int **subgrafo_induzido(int **matriz, int tamanho, char *nome_arquivo);
+/* Função vertices_isolados
+ - Verifica vetor com os vértices isolados, se existir
+*/
+int *vertices_isolados(int **matriz, int tamanho, int *num_vertices);
+
+/* Função vertices_multiplos_5
+ - retorna um vetor com os vértices múltiplos de 5.
+*/
+int *vertices_multiplos_5(int **matriz, int tamanho, int *num_vertices);
+
+/* Função subgrafo_induzido
+ - gera um subgrafo induzido, a partir dos vértices inseridos.
+*/
+int **subgrafo_induzido(int **matriz, int *vertices, int tamanho, int tamanho_induzido);
+
+/* Função conexao_primeiro_ultimo
+ - Verifica se há um caminho que conecte os vertices
+   escolhidos
+*/
+int *conexao_vertices(int **matriz, int tamanho, int vertice_ini, int vertice_fim);

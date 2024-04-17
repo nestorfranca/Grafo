@@ -16,7 +16,7 @@ void mostra_matriz(int **matriz, int tamanho);
 /* Função verifica_simetria
  - Verifica se a matriz é simétrica
 */
-int verifica_simetria(int **matriz);
+int verifica_simetria(int **matriz, int tamanho);
 
 /* Função grau_vertice
   - Retorna o grau de cada vertice
@@ -52,6 +52,19 @@ int **subgrafo_induzido(int **matriz, int *vertices, int tamanho, int tamanho_in
  - escreve a matriz booleana do grafo em um arquivo.
 */
 void salva_grafo(int **matriz_subgrafo, int tamanho, char *nome_arquivo);
+
+/* Função verifica_clique
+*/
+int verifica_clique(int **matriz, int tamanho);
+
+/* Função copia_vetor
+*/
+int *copia_vetor(int *vetor_dst, int *vetor_src, int tamanho_vetor);
+
+/* Função candidator_clique
+*/
+int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice_iter, int *tamanho_clique);
+// int *candidatos_clique(int **matriz, int tamanho, int vertice_ini, int *tamanho_clique)
 
 /* Função conexao_primeiro_ultimo
  - Verifica se há um caminho que conecte os vertices

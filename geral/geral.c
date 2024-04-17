@@ -46,9 +46,9 @@ char *clear(void)
 void cabecalho(char *pagina, char *titulo, char *num_pag)
 {
     system(clear());
-    printf("===============================================================================================\n");
+    printf("======================================================================\n");
     printf("\t%s\t%s\t\t%s\n", pagina, titulo, num_pag);
-    printf("===============================================================================================\n");
+    printf("======================================================================\n");
 }
 
 int teste_input(void)
@@ -71,7 +71,7 @@ int menu_principal(int **matriz, int tamanho) {
     int opcao;
     char nome_contato[35], ch_op4[3];
 
-    cabecalho("\t\t\t", "RESPOSTAS\t", "");
+    cabecalho("GRAFO\t", "RESPOSTAS\t", "");
     
     printf(">>> [1] GRAU DOS VERTICES\n");
     printf(">>> [2] VERTICES ISOLADOS\n");
@@ -96,7 +96,7 @@ int menu_principal(int **matriz, int tamanho) {
                 grau_arquivo(grau, tamanho);
 
                 while (1) {
-                    cabecalho("\t", "\t\tMAIOR GRAU\t", "");
+                    cabecalho("GRAFO\t", "VERTICE DE MAIOR GRAU\t", "");
 
                     printf("Vertice(s) com maior(es) grau:\n");
                     // identifica qual os vértices tem o maior grau:
@@ -121,7 +121,7 @@ int menu_principal(int **matriz, int tamanho) {
             printf("\nAnalisando Grafo...");  delay(ATRASO);
 
             while (1) {
-                cabecalho("\t", "\t\tVERTICES ISOLADOS\t", "");
+                cabecalho("GRAFO\t", "VERTICES ISOLADOS\t", "");
 
                 /* ===== VÉRTICES ISOLADOS ===== */
                 int num_isolados;
@@ -149,21 +149,71 @@ int menu_principal(int **matriz, int tamanho) {
             printf("\nGerando Grafo Gerador...");  delay(ATRASO);
             int tam_induzido;
             int *vertices_induzido = vertices_multiplos_5(matriz, tamanho, &tam_induzido);
+            // printf("tam = %d\n", tam_induzido); 
+            // for (int i = 0; i < tam_induzido; i++) printf("%d\n", vertices_induzido[i]);
+            // delay(1000);
 
             int **subgrafo_multiplo_5 = subgrafo_induzido(matriz, vertices_induzido, tamanho, tam_induzido);
             salva_grafo(subgrafo_multiplo_5, tam_induzido, "dados_grafo_gerador.txt");
-            free(subgrafo_multiplo_5);
 
+            free(vertices_induzido);
+            free(subgrafo_multiplo_5);
             alert(3); /* grafo gerado com sucesso */
             break;
         }
         case '4': { /* maior clique */
             printf("\nAnalisando Grafo...");  delay(ATRASO);
 
+            int i, j, tam_clique = 0, tam_maior_clique = 0;
             while (1) {
-                cabecalho("\t", "\t\tCLIQUE\t", "");
+                cabecalho("GRAFO\t", "MAIOR CLIQUE\t", "");
+                
+                int *vertices_clique = NULL, *vertices_maior_clique = NULL;
+                
+                clock_t inicio = clock(); /* tempo inicial da execução */
+                
+                // testa o maior clique para todas as linhas:
+                for (i = 0; i < tamanho; i++) {
+                    // printf("%d - ", i);
+                    vertices_clique = candidatos_clique(matriz, tamanho, i, i, &tam_clique);
+                    printf("iter: %4d terminou", i);
 
-                printf("Vertice(s) com maior(es) clique:\n");
+                    double tempo_sort = (double)(clock() - inicio) / CLOCKS_PER_SEC;
+                    tempo_sort = tempo_sort * 1000.0; //milisegundos
+                    printf(TXT_green" - Tempo de execucao: %.50lfms\n"TXT_reset, tempo_sort);
+                    // printf("tamanho max: %d\n", tam_clique); delay(100);
+                    // for (int j = 0; j < tam_clique; j++) printf("%d ", vertices_clique[j]);
+                    
+                    // printf("\nfim fora\n"); delay(2000);
+                    if (vertices_clique != NULL) {
+                        // printf("oi\n"); delay(1000);
+                        if (tam_clique > tam_maior_clique) {
+                            // printf("oi2\n"); delay(1000);
+
+                            tam_maior_clique = tam_clique;
+                            // printf("maior: %d\n", tam_maior_clique); delay(1000);
+                            vertices_maior_clique = copia_vetor(vertices_maior_clique, vertices_clique, tam_maior_clique);
+                        }
+                    }
+                }
+                
+
+                if (vertices_maior_clique != NULL) {
+                    // vertices_maior_clique = (int*)realloc(vertices_maior_clique, tam_maior_clique*sizeof(int));
+
+                    printf("Maior clique com %d vertices.\n", tam_maior_clique);
+                    printf("Vertices do maior clique:\n");
+                    
+                    printf("%d", vertices_maior_clique[0]);
+                    for (i = 1; i < tam_maior_clique; i++) {
+                        printf(" - %d", vertices_maior_clique[i]);
+                    }
+                    int **maior_clique = subgrafo_induzido(matriz, vertices_maior_clique, tamanho, tam_maior_clique);
+                    salva_grafo(maior_clique, tam_maior_clique, "dado_grafo_maior_clique.txt");
+                } else {
+                    printf("Nao ha cliques no grafo!\n");
+                }
+                
 
 
                 if (menu_voltar()) break;
@@ -176,7 +226,7 @@ int menu_principal(int **matriz, int tamanho) {
             printf("\nAnalisando Tabela...");  delay(ATRASO);
 
             while (1) {
-                cabecalho("\t", "\t\tCONEXAO ENTRE VERTICES\t", "");
+                cabecalho("GRAFO\t", "CONEXAO ENTRE VERTICES\t", "");
                 
                 int *caminho = conexao_vertices(matriz, tamanho, 0, tamanho-1);
 
@@ -193,7 +243,6 @@ int menu_principal(int **matriz, int tamanho) {
                 } else {
                     printf("Nao ha conexao entre o primeiro e o ultimo vertice!\n");
                 }
-                fflush(stdin);
 
                 if (menu_voltar()) break;
             }

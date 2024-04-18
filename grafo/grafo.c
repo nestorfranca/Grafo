@@ -108,16 +108,13 @@ int *grau_vertice(int **matriz, int tamanho)
 
 int *maior_grau(int *grau, int tamanho, int *num_vertices)
 {
-    int i, vetor_count = 0, maior_grau;
-    int *maiores_vertices = (int*)malloc(tamanho*sizeof(int));
+    int i, vetor_count = 0, maior_grau = 0;
+    int *maior_graus = (int*)malloc(tamanho*sizeof(int));
 
-    maior_grau = grau[0];
-    maiores_vertices[vetor_count++] = 0;
-    
-    for (i = 1; i < tamanho; i++) {
+    for (i = 0; i < tamanho; i++) {
         // Se o grau for igual, então o vértice é adiciona ao vetor maior_grau:
         if (grau[i] == maior_grau)
-            maiores_vertices[vetor_count++] = i;
+            maior_graus[vetor_count++] = i;
             
         // Se encontrar grau maior, o vetor de valor antigo é descosiderado:
         else if (grau[i] > maior_grau) {
@@ -125,16 +122,16 @@ int *maior_grau(int *grau, int tamanho, int *num_vertices)
                 vetor_count = 0;    /* reinicia contagem do vetor */
             }
             maior_grau = grau[i];   /* atualiza o maior grau */
-            maiores_vertices[vetor_count++] = i;
+            maior_graus[vetor_count++] = i;
         }
     }
 
-    maiores_vertices = (int*)realloc(maiores_vertices, (vetor_count+1)*sizeof(int));
-    if (maiores_vertices == NULL) exit(1);
-
-    (*num_vertices) = vetor_count;
-
-    return (vetor_count > 0) ? maiores_vertices : NULL;
+    // realoca memória, para a quantidade correta de elementos no vetor:
+    maior_graus = realoca_vetor(maior_graus, vetor_count);
+    if (maior_graus != NULL)
+        (*num_vertices) = vetor_count;  /* retorna a tamanho do vetor por ponteiro */
+    
+    return maior_graus;
 }
 
 void grau_arquivo(int *grau, int tamanho)
@@ -155,76 +152,69 @@ void grau_arquivo(int *grau, int tamanho)
 
 int *vertices_isolados(int **matriz, int tamanho, int *num_vertices)
 {
-    int *vertice_arr = (int*)malloc(tamanho*sizeof(int));
-    if (vertice_arr == NULL) exit(1);
+    int *vertices_isolado = (int*)malloc(tamanho*sizeof(int));
+    if (vertices_isolado == NULL) exit(1);
 
-    int i, j, vertice_isolado;
+    int i, j, isolado;
     int isolados_count = 0;
 
     // Verifica cada vértice na matriz
     for (i = 0; i < tamanho; i++) {
-        vertice_isolado = 1; /* Assume que o vértice é isolado inicialmente */
+        isolado = 1; /* Assume que o vértice é isolado inicialmente */
 
         // Verifica a linha correspondente ao vértice na matriz
         for (j = 0; j < tamanho; j++) {
             if (matriz[i][j] == 1) {    /* não é isolado */
-                vertice_isolado = 0;
+                isolado = 0;
                 break;  /* interrompe loop */
             }
         }
 
-        // alocar espaço no vetor, para adicionar vértice:
-        if (vertice_isolado)
-            vertice_arr[isolados_count++] = i;
+        // se for isolado, adiciona vértice ao vetor:
+        if (isolado)
+            vertices_isolado[isolados_count++] = i;  /* retorna a tamanho do vetor por ponteiro */
     }
 
-    (*num_vertices) = isolados_count;
+    // realoca memória, para a quantidade correta de elementos no vetor:
+    vertices_isolado = realoca_vetor(vertices_isolado, isolados_count);
+    if (vertices_isolado != NULL)
+        (*num_vertices) = isolados_count;
 
-    if (isolados_count > 0) {
-        vertice_arr = (int*)realloc(vertice_arr, (isolados_count)*sizeof(int));
-        if (vertice_arr == NULL) exit(1);
-        return vertice_arr;
-    }
-
-    return NULL;
+    return vertices_isolado;
 }
 
 int *vertices_multiplos_5(int **matriz, int tamanho, int *num_vertices)
 {
-    int i, tamanho_induzido = 0;
+    int i, tamanho_vetor = 0;
     int *vertices_5mult = (int*)malloc(tamanho*sizeof(int));
     
     for (i = 0; i < tamanho; i++) {
         if (i%5 == 0) {
-            vertices_5mult[tamanho_induzido++] = i;
+            vertices_5mult[tamanho_vetor++] = i;
         } 
     }
 
-    if (tamanho_induzido > 0) {
-        vertices_5mult = (int*)realloc(vertices_5mult, (tamanho_induzido)*sizeof(int));
-        if (vertices_5mult == NULL) exit(1);
-    }
-
-    (*num_vertices) = tamanho_induzido;
+    // realoca memória, para a quantidade correta de elementos no vetor:
+    vertices_5mult = realoca_vetor(vertices_5mult, tamanho_vetor);
+    if (vertices_5mult != NULL)
+        (*num_vertices) = tamanho_vetor;
 
     return vertices_5mult;
 }
 
 int **subgrafo_induzido(int **matriz, int *vertices, int tamanho, int tamanho_induzido)
 {
-    // Determinar o tamanho da nova matriz (vértices múltiplos de 5)
     int i, j;
-    
-    int **matriz_induzida = NULL;
+    int **matriz_induzida = NULL;    
     
     // Alocar memória para a nova matriz
-    if (tamanho_induzido > 0) {
+    if (tamanho > 0 && tamanho_induzido > 0) {
         matriz_induzida = (int**)malloc(tamanho_induzido*sizeof(int*));
-        if (matriz_induzida == NULL) exit(1);
+        if (matriz_induzida == NULL) return NULL;
 
         for (i = 0; i < tamanho_induzido; i++) {
             matriz_induzida[i] = (int*)malloc(tamanho_induzido*sizeof(int));
-            if (matriz_induzida[i] == NULL) exit(1);
+            if (matriz_induzida[i] == NULL) return NULL;
         }
         
         // Preencher a nova matriz com os elementos de índice múltiplo de 5 da matriz original
@@ -270,69 +260,69 @@ void salva_grafo(int **matriz_subgrafo, int tamanho, char *nome_arquivo)
 int verifica_clique(int **matriz, int tamanho)
 {
     int i, j;
-    for (i = 0; i < tamanho; i++) {
-        for (j = (i+1); j < tamanho; j++) {
-            if (matriz[i][j] == 0) {
-                return 0; // Não é um clique
+    
+    if (matriz != NULL) {
+        for (i = 0; i < tamanho; i++) {
+            for (j = i; j < tamanho; j++) {
+                if (matriz[i][j] == 0 && i != j) {
+                    return 0; // Não é um clique
+                }
             }
         }
+        return 1; // É um clique
     }
-    return 1; // É um clique
+    
+    return 0;
 }
 
-int *copia_vetor(int *vetor_dst, int *vetor_src, int tamanho_vetor)
+int *copia_vetor(int *vetor_dst, int *vetor_src, int tam_vetor_dst, int tam_vetor_src)
 {
     if (vetor_dst == NULL)
-        vetor_dst = (int*)malloc((tamanho_vetor)*sizeof(int));
+        vetor_dst = (int*)malloc((tam_vetor_src)*sizeof(int));
+
+    if (tam_vetor_src > tam_vetor_dst) {
+        vetor_dst = realoca_vetor(vetor_dst, tam_vetor_src);
+        tam_vetor_dst = tam_vetor_src;
+    }
 
     int i;
-    if (tamanho_vetor > 0)
-        for (i = 0; i < tamanho_vetor; i++) {
+    if (vetor_dst != NULL && tam_vetor_dst > 0)
+        // memcpy(vetor_dst, vetor_src, (tam_vetor_dst*sizeof(int)));
+        for (i = 0; i < tam_vetor_dst; i++) {
             vetor_dst[i] = vetor_src[i];
         }
     
     return vetor_dst;
 }
 
-// int *candidatos_clique(int **matriz, int tamanho, int vertice_ini, int *tamanho_clique)
 int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice_iter, int *tamanho_clique)
 {
+    // Tipo estático para não repetir inicialização em caso se entrar na recursão:
     static int *vertices_maior_clique = NULL, tam_maior_clique = 0, recursao = 0;
-    // for (int i = 0; i < tam_maior_clique; i++) printf("%d ", vertices_maior_clique[i]); printf("caca\n");
     static int *candidatos = NULL, id_candidatos = 0;
-    int id_candidatos_ant = 0;
-
-    // printf("id = %d\n", id_candidatos); delay(1000);
-    if (id_candidatos == 0) {
-        // printf("comeco\n\n");
-        
-        candidatos = (int*)malloc((tamanho)*sizeof(int));
-        if (candidatos == NULL) exit(1);
-    }
-
+    
     if (matriz == NULL) /* matriz vazia */
         return NULL;
 
-    candidatos[id_candidatos++] = vertice_iter;
-    id_candidatos_ant = id_candidatos;
+    if (id_candidatos == 0) {   /* no início da execução da função, aloca espaço do vetor de candidatos */
+        candidatos = (int*)malloc((tamanho)*sizeof(int));
+        if (candidatos == NULL) return NULL;
+    }
 
-    
-    // for (int i = 0; i < id_candidatos; i++) printf("%d ", candidatos[i]); printf("\n");
-    if (id_candidatos > 1) {
+    candidatos[id_candidatos++] = vertice_iter; /* adiciona o vertice à lista de candidatos */
+    if (id_candidatos > 1) {    /* a partir de 2 vértices no vetor, o teste de clique inicia */
+
+        // cria um subgrafo com os vértices candidatos:
         int **clique = subgrafo_induzido(matriz, candidatos, tamanho, id_candidatos);
-        if (verifica_clique(clique, id_candidatos)) {
-            // printf(" - eh clique\n");
+        if (verifica_clique(clique, id_candidatos)) { /* testa se é clique */
+            // caso encontrar um clique maior, atualiza as variáveis do maior clique
             if (id_candidatos > tam_maior_clique) {
                 tam_maior_clique = id_candidatos;
-                vertices_maior_clique = copia_vetor(vertices_maior_clique, candidatos, tam_maior_clique);
-                // printf("tam_max: %d\n", tam_maior_clique); delay(1000);
-                // for (int i = 0; i < tam_maior_clique; i++) printf("%d ", vertices_maior_clique[i]); printf("caca\n");
-
+                vertices_maior_clique = copia_vetor(vertices_maior_clique, candidatos, id_candidatos, tam_maior_clique);
             }
             free(clique);
 
         } else {
-
             free(clique);
             return NULL;        /* os vértices NÃO formam um clique */
         }
@@ -342,46 +332,45 @@ int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice
     int i, j;
     for (i = (vertice_iter+1); i < tamanho; i++) {
         if (matriz[vertice_linha][i] != 0) {
-            // printf("m[%d][%d] = %d\n", vertice_linha, i, matriz[vertice_linha][i]); delay(1000);
-
-            recursao++;
+            
+            recursao++; /* incrementa antes de entrar na recursão */
             candidatos_clique(matriz, tamanho, vertice_linha, i, &tam_maior_clique);
-            recursao--;
 
-            id_candidatos = id_candidatos_ant;
-
-        }
-        
-        if (recursao == 0 && i == tamanho-1) {
-            // printf("tam_max: %d\n", tam_maior_clique);
-            (*tamanho_clique) = tam_maior_clique;
-
-            // for (int i = 0; i < tam_maior_clique; i++) printf("%d ", vertices_maior_clique[i]); printf("caca\n"); delay(1000);
-            
-            // reseta os parâmetros estáticos:
-            id_candidatos = 0; recursao = 0; tam_maior_clique = 0;
-            free(candidatos);
-            
-            // printf("fim dentro\n"); delay(2000);
-            return vertices_maior_clique;
+            recursao--; /* decrementa ao voltar */
+            id_candidatos--; /* retorna o id a posição anterior à recursão */
         }
     }
-    // free(candidatos);
+    
+    // assim que voltar para o nível original, retorna maior vetor encontrado:
+    if (recursao == 0) {
+        
+        vertices_maior_clique = realoca_vetor(vertices_maior_clique, tam_maior_clique);
+        if (vertices_maior_clique != NULL)
+            (*tamanho_clique) = tam_maior_clique;
+
+        // reseta os parâmetros estáticos:
+        id_candidatos = 0; recursao = 0; tam_maior_clique = 0;
+        free(candidatos);
+        return vertices_maior_clique;
+    }
+    
     /* Não há um candidatos ligando o primeiro e o último vértice */
     return NULL;
 }
 
 int *conexao_vertices(int **matriz, int tamanho, int vertice_ini, int vertice_fim)
 {
-    static int *caminho, id_caminho = 0;
-    int id_caminho_ant = 0;
+    // Tipo estático para não repetir inicialização em caso se entrar na recursão:
+    static int *caminho, id_caminho = 0, recursao = 0;
+    int id_caminho_ant;
 
+    // printf("id: %d\n", id_caminho); delay(1000);
     if (matriz == NULL) /* matriz vazia */
         return NULL;
 
     if (id_caminho == 0) {
         caminho = (int*)malloc(tamanho+1*sizeof(int));
-        if (caminho == NULL) exit(1);
+        if (caminho == NULL) return NULL;
     }
 
     caminho[id_caminho++] = vertice_ini; /* adiciona vértice no caminho */
@@ -393,27 +382,29 @@ int *conexao_vertices(int **matriz, int tamanho, int vertice_ini, int vertice_fi
         return caminho;
     }
 
-    /* verifica, por recursão, se há alguma vértice conectado ao primeiro,
-       que se ligue ao último
-    */
+    // verifica os vértices vizinhos, recursivamente:
     int i, *caminho_temp;
     for (i = vertice_ini+1; i <= vertice_fim; i++) {
         if (matriz[vertice_ini][i] == 1) {
+            recursao++;
             caminho_temp = conexao_vertices(matriz, tamanho, i, vertice_fim);
+            recursao--;
 
             if (caminho_temp != NULL) { /* encontrou uma conexão */
                 caminho = caminho_temp;
-                caminho = (int*)realloc(caminho, (id_caminho+1)*sizeof(int));
-                if (caminho == NULL) exit(1);
-
+                caminho = realoca_vetor(caminho, (id_caminho+1));
+                if (caminho == NULL) return NULL;
                 caminho[id_caminho] = 0;  /* marcador de parada no fim */
+
+                if (recursao == 0)
+                    id_caminho = 0;
+                
                 return caminho;         /* finaliza busca */
             } 
 
             else { /* entrou numa ramificação que não se conecta ao último vértice */
-                /* busca continua */
-                caminho[id_caminho] = 0;        /* limpa o ramo errado do caminho */
                 id_caminho = id_caminho_ant;    /* índice retorna ao vértice de origem do ramo */
+                /* a busca continua */
             }
         }
     }

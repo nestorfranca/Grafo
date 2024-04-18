@@ -108,10 +108,11 @@ int menu_principal(int **matriz, int tamanho) {
 
                     // libera memória alocada
                     free(maiores_grau);
-                    free(grau);
 
                     if (menu_voltar()) break;
                 }
+
+                free(grau);
             }
 
             delay(ATRASO);
@@ -149,9 +150,6 @@ int menu_principal(int **matriz, int tamanho) {
             printf("\nGerando Grafo Gerador...");  delay(ATRASO);
             int tam_induzido;
             int *vertices_induzido = vertices_multiplos_5(matriz, tamanho, &tam_induzido);
-            // printf("tam = %d\n", tam_induzido); 
-            // for (int i = 0; i < tam_induzido; i++) printf("%d\n", vertices_induzido[i]);
-            // delay(1000);
 
             int **subgrafo_multiplo_5 = subgrafo_induzido(matriz, vertices_induzido, tamanho, tam_induzido);
             salva_grafo(subgrafo_multiplo_5, tam_induzido, "dados_grafo_gerador.txt");
@@ -165,41 +163,33 @@ int menu_principal(int **matriz, int tamanho) {
             printf("\nAnalisando Grafo...");  delay(ATRASO);
 
             int i, j, tam_clique = 0, tam_maior_clique = 0;
+            int *vertices_clique = NULL, *vertices_maior_clique = NULL;
+                
             while (1) {
                 cabecalho("GRAFO\t", "MAIOR CLIQUE\t", "");
                 
-                int *vertices_clique = NULL, *vertices_maior_clique = NULL;
-                
                 clock_t inicio = clock(); /* tempo inicial da execução */
                 
-                // testa o maior clique para todas as linhas:
-                for (i = 0; i < tamanho; i++) {
-                    // printf("%d - ", i);
-                    vertices_clique = candidatos_clique(matriz, tamanho, i, i, &tam_clique);
-                    printf("iter: %4d terminou", i);
+                if (vertices_maior_clique == NULL) {
+                    // testa o maior clique para todas as linhas:
+                    for (i = 0; i < tamanho; i++) {
+                        vertices_clique = candidatos_clique(matriz, tamanho, i, i, &tam_clique);
+                        printf("iter: %4d terminou", (i+1));
+                        double tempo_sort = (double)(clock() - inicio) / CLOCKS_PER_SEC;
+                        tempo_sort = tempo_sort * 1000.0; //milisegundos
+                        printf(TXT_green" - Tempo de execucao: %.10lfms\n"TXT_reset, tempo_sort);
 
-                    double tempo_sort = (double)(clock() - inicio) / CLOCKS_PER_SEC;
-                    tempo_sort = tempo_sort * 1000.0; //milisegundos
-                    printf(TXT_green" - Tempo de execucao: %.50lfms\n"TXT_reset, tempo_sort);
-                    // printf("tamanho max: %d\n", tam_clique); delay(100);
-                    // for (int j = 0; j < tam_clique; j++) printf("%d ", vertices_clique[j]);
-                    
-                    // printf("\nfim fora\n"); delay(2000);
-                    if (vertices_clique != NULL) {
-                        // printf("oi\n"); delay(1000);
-                        if (tam_clique > tam_maior_clique) {
-                            // printf("oi2\n"); delay(1000);
+                        if (vertices_clique != NULL) {
+                            if (tam_clique > tam_maior_clique) {
 
-                            tam_maior_clique = tam_clique;
-                            // printf("maior: %d\n", tam_maior_clique); delay(1000);
-                            vertices_maior_clique = copia_vetor(vertices_maior_clique, vertices_clique, tam_maior_clique);
+                                tam_maior_clique = tam_clique;
+                                vertices_maior_clique = copia_vetor(vertices_maior_clique, vertices_clique, tam_maior_clique, tam_clique);
+                            }
                         }
                     }
                 }
                 
-
                 if (vertices_maior_clique != NULL) {
-                    // vertices_maior_clique = (int*)realloc(vertices_maior_clique, tam_maior_clique*sizeof(int));
 
                     printf("Maior clique com %d vertices.\n", tam_maior_clique);
                     printf("Vertices do maior clique:\n");
@@ -208,16 +198,20 @@ int menu_principal(int **matriz, int tamanho) {
                     for (i = 1; i < tam_maior_clique; i++) {
                         printf(" - %d", vertices_maior_clique[i]);
                     }
+                    printf("\n");
+
                     int **maior_clique = subgrafo_induzido(matriz, vertices_maior_clique, tamanho, tam_maior_clique);
                     salva_grafo(maior_clique, tam_maior_clique, "dado_grafo_maior_clique.txt");
+
+                    for (i = 0; i < tam_maior_clique; i++) free(maior_clique[i]);                   
+                    free(maior_clique);
                 } else {
                     printf("Nao ha cliques no grafo!\n");
                 }
                 
-
-
                 if (menu_voltar()) break;
             }
+            free(vertices_maior_clique);
 
             delay(ATRASO);
             break;
@@ -271,17 +265,35 @@ int menu_voltar()
     alert_msg();
     printf("Aperte ENTER para Retornar ao Menu: ");
 
-
     int i = 0;
     while ((op[i] = getchar()) != '\n') i++;
     op[i] = '\0';
-    
+
     if (strlen(op) == 0) {          /* verifica se está vazio */
         alert(0);   /* voltando para o menu (sem mensagem de erro) */
         return 1;
     }
     alert(4);   /* página não solicita entrada */
     return 0;
+}
+
+int *realoca_vetor(int *vetor, int tamanho)
+{
+    int i, *novo_vetor = NULL;
+    if (tamanho > 0)
+        novo_vetor = (int*)malloc(tamanho*sizeof(int));
+    
+    if (novo_vetor == NULL) {
+        free(vetor);
+        return NULL;
+    }
+
+    // memcpy(novo_vetor, vetor, tamanho);
+    for (i = 0; i < tamanho; i++) {
+        novo_vetor[i] = vetor[i];
+    }
+
+    return novo_vetor;
 }
 
 void alert(int cod)
@@ -298,6 +310,7 @@ void alert_msg(void)
     else if (alert_cod == 1) printf(TXT_yellow"\nInsira uma opcao valida!\n"TXT_reset);
     else if (alert_cod == 2) printf(TXT_green"\nArquivo salvo com sucesso!\n"TXT_reset);
     else if (alert_cod == 3) printf(TXT_green"\nGrafo gerado e salvo com sucesso!\n"TXT_reset);
+    else if (alert_cod == 4) printf(TXT_yellow"\nPagina nao solicita entrada!\n"TXT_reset);
     // alerta de processo:
 
     alert(0);    /* reseta marcador */

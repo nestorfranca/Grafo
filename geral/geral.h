@@ -28,6 +28,11 @@ int menu_principal(int **matriz, int tamanho);
 */
 int menu_voltar();
 
+/* Função realoca_vetor
+ - atualiza o tamanho do vetor
+*/
+int *realoca_vetor(int *vetor, int tamanho);
+
 /* Função teste_input
  - Verifica se o valor é uma string, número positivo ou   
    negativo.

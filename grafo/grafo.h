@@ -59,12 +59,14 @@ int verifica_clique(int **matriz, int tamanho);
 
 /* Função copia_vetor
 */
-int *copia_vetor(int *vetor_dst, int *vetor_src, int tamanho_vetor);
+int *copia_vetor(int *vetor_dst, int *vetor_src, int tam_vetor_dst, int tam_vetor_src);
 
 /* Função candidator_clique
 */
 int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice_iter, int *tamanho_clique);
-// int *candidatos_clique(int **matriz, int tamanho, int vertice_ini, int *tamanho_clique)
+// int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int *tamanho_clique);
+
+// int *procura_maior_clique(int **matriz, int *vetor_candidatos, int tamanho, int vertice_linha, int vertice_iter, int *tamanho_clique);
 
 /* Função conexao_primeiro_ultimo
  - Verifica se há um caminho que conecte os vertices

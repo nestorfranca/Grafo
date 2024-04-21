@@ -86,7 +86,7 @@ int menu_principal(int **matriz, int tamanho) {
 
     switch (opcao) {
         case '1': { /* Grau dos vertices */
-            printf("\nCalculando Grau...");  delay(ATRASO);
+            printf("\nCalculando Grau..."); delay(ATRASO);
 
             // calcula o grau de todos os vértices:
             int *grau = grau_vertice(matriz, tamanho);
@@ -100,7 +100,7 @@ int menu_principal(int **matriz, int tamanho) {
 
                     printf("Vertice(s) com maior(es) grau:\n");
                     // identifica qual os vértices tem o maior grau:
-                    int quantidade_vertices;
+                    int quantidade_vertices = 0;
                     int *maiores_grau = maior_grau(grau, tamanho, &quantidade_vertices);
                     for (int i = 0; i < quantidade_vertices; i++) {
                         printf("Vertice %d:  %d\n", (maiores_grau[i]+1), grau[maiores_grau[i]]);
@@ -113,6 +113,8 @@ int menu_principal(int **matriz, int tamanho) {
                 }
 
                 free(grau);
+            } else {
+                alert(-3);  /* Erro: matriz com tamanho 0 ou não encontrada */
             }
 
             delay(ATRASO);
@@ -125,7 +127,7 @@ int menu_principal(int **matriz, int tamanho) {
                 cabecalho("GRAFO\t", "VERTICES ISOLADOS\t", "");
 
                 /* ===== VÉRTICES ISOLADOS ===== */
-                int num_isolados;
+                int num_isolados = 0;
                 int *isolados = vertices_isolados(matriz, tamanho, &num_isolados);
                 
                 printf("Encontrou %d vertice(s) isolado(s):\n", num_isolados);
@@ -148,11 +150,13 @@ int menu_principal(int **matriz, int tamanho) {
         }
         case '3': { /* Grafo com vértices múltiplo de 5 */
             printf("\nGerando Grafo Gerador...");  delay(ATRASO);
-            int tam_induzido;
+            int tam_induzido = 0;
             int *vertices_induzido = vertices_multiplos_5(matriz, tamanho, &tam_induzido);
 
             int **subgrafo_multiplo_5 = subgrafo_induzido(matriz, vertices_induzido, tamanho, tam_induzido);
-            salva_grafo(subgrafo_multiplo_5, tam_induzido, "dados_grafo_gerador.txt");
+            if (subgrafo_multiplo_5 != NULL) {
+                salva_grafo(subgrafo_multiplo_5, tam_induzido, "dados_grafo_gerador.txt");
+            }
 
             free(vertices_induzido);
             free(subgrafo_multiplo_5);
@@ -173,7 +177,10 @@ int menu_principal(int **matriz, int tamanho) {
                 if (vertices_maior_clique == NULL) {
                     // testa o maior clique para todas as linhas:
                     for (i = 0; i < tamanho; i++) {
+                        // vertices_clique = candidatos_clique(matriz, vertices_clique, tamanho, i, i);
                         vertices_clique = candidatos_clique(matriz, tamanho, i, i, &tam_clique);
+                        // for (int i = 0; vertices_clique[i] != -1; i++) printf("%d ", vertices_clique[i]); delay(1000);
+                        
                         printf("iter: %4d terminou", (i+1));
                         double tempo_sort = (double)(clock() - inicio) / CLOCKS_PER_SEC;
                         tempo_sort = tempo_sort * 1000.0; //milisegundos
@@ -211,26 +218,27 @@ int menu_principal(int **matriz, int tamanho) {
                 
                 if (menu_voltar()) break;
             }
-            free(vertices_maior_clique);
 
+            free(vertices_maior_clique);
             delay(ATRASO);
             break;
         }
         case '5': { /* conexão entre vértices */
             printf("\nAnalisando Tabela...");  delay(ATRASO);
 
+            int i, *caminho = NULL;
             while (1) {
                 cabecalho("GRAFO\t", "CONEXAO ENTRE VERTICES\t", "");
                 
-                int *caminho = conexao_vertices(matriz, tamanho, 0, tamanho-1);
+                if (caminho == NULL)
+                    caminho = conexao_vertices(matriz, caminho, tamanho, 0, tamanho-1);
 
                 if (caminho != NULL) {
                     printf("Caminho entres os vertices %d e %d:\n", 1, tamanho);
                     
-                    printf("%d ", caminho[0]+1);
-                    int i;
-                    for (i = 1; caminho[i] != 0; i++) {
-                        printf("-> %d ", caminho[i]+1);
+                    printf("%d", caminho[0]+1);
+                    for (i = 1; caminho[i] != -1; i++) {
+                        printf(" -> %d", caminho[i]+1);
                     }
                     printf("\n");
 
@@ -240,7 +248,8 @@ int menu_principal(int **matriz, int tamanho) {
 
                 if (menu_voltar()) break;
             }
-
+            
+            free(caminho);
             delay(ATRASO);
             break;
         }
@@ -293,6 +302,7 @@ int *realoca_vetor(int *vetor, int tamanho)
         novo_vetor[i] = vetor[i];
     }
 
+    free(vetor);
     return novo_vetor;
 }
 
@@ -312,6 +322,7 @@ void alert_msg(void)
     else if (alert_cod == 3) printf(TXT_green"\nGrafo gerado e salvo com sucesso!\n"TXT_reset);
     else if (alert_cod == 4) printf(TXT_yellow"\nPagina nao solicita entrada!\n"TXT_reset);
     // alerta de processo:
+    else if (alert_cod == -3) printf(TXT_red"\nMatriz nao encontrada!\n"TXT_reset);
 
     alert(0);    /* reseta marcador */
 }

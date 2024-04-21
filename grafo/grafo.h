@@ -67,10 +67,11 @@ int *copia_vetor(int *vetor_dst, int *vetor_src, int tam_vetor_dst, int tam_veto
  - Testa todas as possibilidades de cominação entre vértices conectados
    ao vértice de uma linha, até achar o maior clique.
 */
+// int *candidatos_clique(int **matriz, int *vetor_candidatos, int tamanho, int vertice_linha, int vertice_iter);
 int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice_iter, int *tamanho_clique);
 
 /* Função conexao_primeiro_ultimo
  - Verifica se há um caminho que conecte os vertices
    escolhidos
 */
-int *conexao_vertices(int **matriz, int tamanho, int vertice_ini, int vertice_fim);
+int *conexao_vertices(int **matriz, int *vetor_caminho, int tamanho, int vertice_ini, int vertice_fim);

@@ -16,7 +16,13 @@ main.c: Funções auxiliares para leitura e escrita de arquivos, etc.
 dados_matriz.txt: Arquivo de exemplo contendo uma matriz de adjacência para teste.
 
 # 2. Módulos utilizados
+## grafo.h
+Neste módulo, implementamos todas as principais funções referentes à manipulação e análise do grafo.
 
+##  geral.h
+Nesse módulo, implementamos o conjunto das funções usandas na interface do menu para a tabela Hash e nas tratativas realizadas.
+
+## Funções em hash.h
 ### Função importa_matriz
 * **Descrição:** Importa uma matriz de adjacência de um arquivo externo.
 ```c
@@ -88,3 +94,46 @@ int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice
 int *conexao_vertices(int **matriz, int *vetor_caminho, int tamanho, int vertice_ini, int vertice_fim);
 ```
 
+
+## Funções em geral.h
+### Função delay
+* **Descrição:** Gera um atraso, em milissegundos, na resposta do programa.
+```c
+void delay(double milissegundos);
+```
+### Função clear
+* **Descrição:** Limpa o terminal de acordo com o SO do usuário.
+```c
+char *clear(void);
+```
+### Função cabecalho
+* **Descrição:** Adiciona o cabeçalho do menu atual.
+```c
+void cabecalho(char *pagina, char *titulo, char *num_pag);
+```
+### Função menu_principal
+* **Descrição:** Exibe o menu principal.
+```c
+int menu_principal(Contato *arr_contatos);
+```
+### Função teste_input
+* **Descrição:** Verifica se o valor é uma string, número positivo ou negativo.
+```c
+int teste_input(void);
+```
+### Função teste_formato
+* **Descrição:** Verifica o tipo da entrada
+```c
+int teste_formato(char *str);
+```
+### Função alert
+* **Descrição:** Modifica o código de erro atual do sistema.
+```c
+void alert(int cod);
+```
+### Função alert_msg
+* **Descrição:** Exibe uma mensagem de erro referente ao código de 
+   erro salvo no sistema.
+```c
+void alert_msg(void);
+```

@@ -6,7 +6,7 @@
 /* Função importa_matriz
  - Importa dados da matriz de um arquivo externo
 */
-int **importa_matriz(char *nome_arquivo, int **matriz, int *tamanho);
+int **le_matriz(char *nome_arquivo, int **matriz, int *tamanho);
 
 /* Função mostra_matriz
  - Exibe os valores da matriz na interface

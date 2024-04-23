@@ -281,26 +281,26 @@ int *copia_vetor(int *vetor_dst, int *vetor_src, int tam_vetor_dst, int tam_veto
 
     int i;
     if (vetor_dst != NULL && tam_vetor_dst > 0)
-        // memcpy(vetor_dst, vetor_src, (tam_vetor_dst*sizeof(int)));
         for (i = 0; i < tam_vetor_dst; i++) {
             vetor_dst[i] = vetor_src[i];
         }
     
+    // free(vetor_src);
     return vetor_dst;
 }
 
-// int *candidatos_clique(int **matriz, int *vetor_candidatos, int tamanho, int vertice_linha, int vertice_iter)
 int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice_iter, int *tamanho_clique)
 {
     // Tipo estático para não repetir inicialização em caso se entrar na recursão:
-    static int *vertices_maior_clique = NULL, tam_maior_clique = 0, recursao = 0;
+    static int *vertices_maior_clique = NULL, tam_maior_clique, recursao;
     static int *vetor_candidatos = NULL, id_candidatos = 0;
     int **clique = NULL;
 
     if (matriz == NULL) /* matriz vazia */
         return NULL;
 
-    if (id_candidatos == 0) {   /* no início da execução da função, aloca espaço do vetor de candidatos */
+    // no início da execução da função, aloca espaço do vetor de candidatos:
+    if (id_candidatos == 0) {
         vetor_candidatos = (int*)malloc((tamanho)*sizeof(int));
         if (vetor_candidatos == NULL) return NULL;
     }
@@ -308,24 +308,24 @@ int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice
     vetor_candidatos[id_candidatos++] = vertice_iter; /* adiciona o vertice à lista de candidatos */
     
     if (id_candidatos > 1) {    /* o teste de clique ocorre apenas com 2 ou mais vértices */
-        // printf("id: %d\ttam_maior: %d\n", id_candidatos, tam_maior_clique); delay(1000);
 
-        if (id_candidatos > tam_maior_clique) { /* teste para cliques menores ou igual ao maior não importam */
-            // for (int i = 0; i < id_candidatos; i++) {printf("%d ", vetor_candidatos[i]); delay(1000);} printf("\n");
-            // cria um subgrafo com os vértices candidatos:
-            clique = subgrafo_induzido(matriz, vetor_candidatos, tamanho, id_candidatos);
-            if (verifica_clique(clique, id_candidatos)) { /* testa se é clique */
-            // caso encontrar um clique maior, atualiza as variáveis do maior clique
-                tam_maior_clique = id_candidatos;
+        // cria um subgrafo com os vértices candidatos:
+        clique = subgrafo_induzido(matriz, vetor_candidatos, tamanho, id_candidatos);
+        if (verifica_clique(clique, id_candidatos)) { /* testa se é clique */
+            
+            // cliques menores ou igual ao maior clique não importam
+            if (id_candidatos > tam_maior_clique) {
+                
+                tam_maior_clique = id_candidatos;   /* atualiza as variáveis do maior clique */
                 vertices_maior_clique = copia_vetor(vertices_maior_clique, vetor_candidatos, id_candidatos, tam_maior_clique);
-                for (int i = 0; i < id_candidatos; i++) {printf("%d ", vertices_maior_clique[i]); delay(1000);} printf("\n");
-            free(clique);
-            } else {
                 free(clique);
-                return NULL;        /* os vértices NÃO formam um clique */
-            }
+            } 
+        } else {
+            free(clique);
+            return NULL;        /* os vértices NÃO formam um clique */
         }
     }
+
 
     // testa todos os cliques possíveis que possua o "vertice_iter"
     int i, j;
@@ -333,8 +333,7 @@ int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice
         if (matriz[vertice_linha][i] != 0) {
             
             recursao++; /* incrementa antes de entrar na recursão */
-            // candidatos_clique(matriz, vetor_candidatos, tamanho, vertice_linha, i);
-            candidatos_clique(matriz, tamanho, vertice_linha, i, &tamanho_clique);
+            candidatos_clique(matriz, tamanho, vertice_linha, i, tamanho_clique);
             recursao--; /* decrementa ao voltar */
             id_candidatos--; /* retorna o id a posição anterior à recursão */
         }
@@ -343,13 +342,10 @@ int *candidatos_clique(int **matriz, int tamanho, int vertice_linha, int vertice
     // assim que voltar para o nível original, retorna maior vetor encontrado:
     if (recursao == 0) {
         
-        vertices_maior_clique = realoca_vetor(vertices_maior_clique, tam_maior_clique);
-        if (vertices_maior_clique != NULL)
-            (*tamanho_clique) = tam_maior_clique;
-            // vertices_maior_clique[id_candidatos] = -1;   /* marca o fim do vetor */
+        (*tamanho_clique) = tam_maior_clique;
         
         // reseta os parâmetros estáticos:
-        id_candidatos = 0; recursao = 0; tam_maior_clique = 0;
+        id_candidatos = 0;
         free(vetor_candidatos);
         return vertices_maior_clique;
     }
@@ -363,6 +359,7 @@ int *conexao_vertices(int **matriz, int *vetor_caminho, int tamanho, int vertice
     // Tipo estático para não repetir inicialização em caso se entrar na recursão
     static int id_caminho = 0;
     int id_caminho_origem;
+    // printf("id: %d\n", id_caminho); delay(100);
 
     if (matriz == NULL) /* matriz vazia */
         return NULL;
@@ -378,6 +375,7 @@ int *conexao_vertices(int **matriz, int *vetor_caminho, int tamanho, int vertice
     if (matriz[vertice_ini][vertice_fim] == 1) { /* há conexão direta entre o primeiro e o último vértice */
         vetor_caminho[id_caminho++] = vertice_fim;
         vetor_caminho[id_caminho] = -1; /* marcador de parada no fim */
+        id_caminho = 0;
         return vetor_caminho;
     }
 
